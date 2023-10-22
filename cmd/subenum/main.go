@@ -53,7 +53,7 @@ func main() {
 
 `)
 	fmt.Println(color.Colorize(color.Red, "[*] This tool is for training."))
-	fmt.Println(color.Colorize(color.Red, "[*]Enter subcheck -h to show help"))
+	fmt.Println(color.Colorize(color.Red, "[*]Enter subenum -h to show help"))
 	app := &cli.App{
 		Flags: []cli.Flag{
 			&cli.StringFlag{
