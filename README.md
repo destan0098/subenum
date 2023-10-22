@@ -3,7 +3,7 @@
 ## Description
 
 This Tool Check Subdomains has Open Port 80 or 443 and use cdn or not
-
+This tool is for training.
 
 
 - Check http and https
@@ -77,6 +77,6 @@ GLOBAL OPTIONS:
 
 ## Features
 
-This Tool Check Subdomains has Open Port 80 or 443 and use cdn or not
+This Tool Check and find Subdomains has Open Port 80 or 443 and use cdn or not
 
 
