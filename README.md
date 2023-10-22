@@ -72,7 +72,7 @@ GLOBAL OPTIONS:
 
 ## ScreenShot
 
-![IP Show](/screenshot1.png?raw=true "subenum")
+![IP Show](/screenshot.png?raw=true "subenum")
 
 
 ## Features
