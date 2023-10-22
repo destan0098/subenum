@@ -14,11 +14,7 @@ func Subfindfile(domains string) *bytes.Buffer {
 		Threads:            10, // Thread controls the number of threads to use for active enumerations
 		Timeout:            30, // Timeout is the seconds to wait for sources to respond
 		MaxEnumerationTime: 10, // MaxEnumerationTime is the maximum amount of time in mins to wait for enumeration
-		// ResultCallback: func(s *resolve.HostEntry) {
-		// callback function executed after each unique subdomain is found
-		// },
-		// ProviderConfig: "your_provider_config.yaml",
-		// and other config related options
+
 	}
 	log.SetFlags(0)
 	subfinder, err := runner.NewRunner(subfinderOpts)
@@ -55,11 +51,7 @@ func Subfindpipe(reader io.Reader) *bytes.Buffer {
 		Threads:            10, // Thread controls the number of threads to use for active enumerations
 		Timeout:            30, // Timeout is the seconds to wait for sources to respond
 		MaxEnumerationTime: 10, // MaxEnumerationTime is the maximum amount of time in mins to wait for enumeration
-		// ResultCallback: func(s *resolve.HostEntry) {
-		// callback function executed after each unique subdomain is found
-		// },
-		// ProviderConfig: "your_provider_config.yaml",
-		// and other config related options
+
 	}
 	log.SetFlags(0)
 	subfinder, err := runner.NewRunner(subfinderOpts)
@@ -90,11 +82,7 @@ func Subfind(domain string) *bytes.Buffer {
 		Threads:            10, // Thread controls the number of threads to use for active enumerations
 		Timeout:            30, // Timeout is the seconds to wait for sources to respond
 		MaxEnumerationTime: 10, // MaxEnumerationTime is the maximum amount of time in mins to wait for enumeration
-		// ResultCallback: func(s *resolve.HostEntry) {
-		// callback function executed after each unique subdomain is found
-		// },
-		// ProviderConfig: "your_provider_config.yaml",
-		// and other config related options
+
 	}
 	log.SetFlags(0)
 
@@ -109,10 +97,5 @@ func Subfind(domain string) *bytes.Buffer {
 		log.Fatalf("failed to enumerate single domain: %v", err)
 	}
 
-	// To run subdomain enumeration on a list of domains from file/reader
-	//
-
-	// print the output
-	//log.Println(output.String())
 	return output
 }
