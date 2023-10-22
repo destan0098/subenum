@@ -29,7 +29,7 @@ type DomainResult struct {
 
 var outputs, inputs, domains string = "", "", ""
 
-var pipel int
+var pipel, cdn int
 var results []DomainResult
 
 func main() {
@@ -74,6 +74,12 @@ func main() {
 				Name:  "pipe",
 				Usage: "Enter just from pipe line",
 				Count: &pipel,
+			},
+			&cli.BoolFlag{
+				Name:    "cdn",
+				Aliases: []string{"c"},
+				Usage:   "check cdn and waf and cloud",
+				Count:   &cdn,
 			},
 
 			&cli.StringFlag{
@@ -135,6 +141,8 @@ func writeResults(results []DomainResult, outputfile string) {
 	}
 }
 func withname(domain string) []DomainResult {
+	var result DomainResult
+
 	if strings.HasPrefix(domain, "https://") {
 		if strings.HasPrefix(domain, "http://") {
 			fmt.Println(color.Colorize(color.Red, "Input Domain Without http or https"))
@@ -155,7 +163,7 @@ func withname(domain string) []DomainResult {
 			return nil
 		}
 
-		domain := string(line)
+		domain = string(line)
 		domain = removeNewline(domain)
 
 		// Check if port 80 is open for the domain.
@@ -163,24 +171,36 @@ func withname(domain string) []DomainResult {
 
 		// Check if port 443 is open for the domain.
 		port443, err443 := httpcheck.IsPortOpen443(domain)
+		if cdn > 0 {
+			// Check if the domain is on a CDN.
+			isCDNs, CDNname := cdncheck.IsCDN(domain)
+			isClouds, CloudName := cdncheck.IsCloud(domain)
+			isWAFs, WAFname := cdncheck.IsWaf(domain)
 
-		// Check if the domain is on a CDN.
-		isCDNs, CDNname := cdncheck.IsCDN(domain)
-		isClouds, CloudName := cdncheck.IsCloud(domain)
-		isWAFs, WAFname := cdncheck.IsWaf(domain)
-
-		result := DomainResult{
-			Domain:    domain,
-			Port80:    port80 && err80 == nil,
-			Port443:   port443 && err443 == nil,
-			IsCDN:     isCDNs,
-			CDNname:   CDNname,
-			isCloud:   isClouds,
-			CloudName: CloudName,
-			isWAF:     isWAFs,
-			WAFname:   WAFname,
+			result = DomainResult{
+				Domain:    domain,
+				Port80:    port80 && err80 == nil,
+				Port443:   port443 && err443 == nil,
+				IsCDN:     isCDNs,
+				CDNname:   CDNname,
+				isCloud:   isClouds,
+				CloudName: CloudName,
+				isWAF:     isWAFs,
+				WAFname:   WAFname,
+			}
+		} else {
+			result = DomainResult{
+				Domain:    domain,
+				Port80:    port80 && err80 == nil,
+				Port443:   port443 && err443 == nil,
+				IsCDN:     false,
+				CDNname:   "",
+				isCloud:   false,
+				CloudName: "",
+				isWAF:     false,
+				WAFname:   "",
+			}
 		}
-
 		// If port 80 or 443 is open, print a message and store the result.
 		if result.Port80 || port443 {
 			fmt.Printf(color.Colorize(color.Green, "[+] Domain %s is Opened\n"), result.Domain)
@@ -196,7 +216,7 @@ func removeNewline(url string) string {
 }
 func withlist(inputfile string) []DomainResult {
 
-	var results []DomainResult
+	var result DomainResult
 	subdomains := subfind.Subfindfile(inputfile)
 	for {
 		line, err := subdomains.ReadBytes('\n')
@@ -216,24 +236,36 @@ func withlist(inputfile string) []DomainResult {
 
 		// Check if port 443 is open for the domain.
 		port443, err443 := httpcheck.IsPortOpen443(domain)
+		if cdn > 0 {
+			// Check if the domain is on a CDN.
+			isCDNs, CDNname := cdncheck.IsCDN(domain)
+			isClouds, CloudName := cdncheck.IsCloud(domain)
+			isWAFs, WAFname := cdncheck.IsWaf(domain)
 
-		// Check if the domain is on a CDN.
-		isCDNs, CDNname := cdncheck.IsCDN(domain)
-		isClouds, CloudName := cdncheck.IsCloud(domain)
-		isWAFs, WAFname := cdncheck.IsWaf(domain)
-
-		result := DomainResult{
-			Domain:    domain,
-			Port80:    port80 && err80 == nil,
-			Port443:   port443 && err443 == nil,
-			IsCDN:     isCDNs,
-			CDNname:   CDNname,
-			isCloud:   isClouds,
-			CloudName: CloudName,
-			isWAF:     isWAFs,
-			WAFname:   WAFname,
+			result = DomainResult{
+				Domain:    domain,
+				Port80:    port80 && err80 == nil,
+				Port443:   port443 && err443 == nil,
+				IsCDN:     isCDNs,
+				CDNname:   CDNname,
+				isCloud:   isClouds,
+				CloudName: CloudName,
+				isWAF:     isWAFs,
+				WAFname:   WAFname,
+			}
+		} else {
+			result = DomainResult{
+				Domain:    domain,
+				Port80:    port80 && err80 == nil,
+				Port443:   port443 && err443 == nil,
+				IsCDN:     false,
+				CDNname:   "",
+				isCloud:   false,
+				CloudName: "",
+				isWAF:     false,
+				WAFname:   "",
+			}
 		}
-
 		// If port 80 or 443 is open, print a message and store the result.
 		if result.Port80 || port443 {
 			fmt.Printf(color.Colorize(color.Green, "[+] Domain %s is Opened\n"), result.Domain)
@@ -246,7 +278,7 @@ func withlist(inputfile string) []DomainResult {
 }
 
 func withpip() []DomainResult {
-
+	var result DomainResult
 	subdomains := subfind.Subfindpipe(os.Stdin)
 	for {
 		line, err := subdomains.ReadBytes('\n')
@@ -272,22 +304,35 @@ func withpip() []DomainResult {
 
 		// Check if port 443 is open for the domain.
 		port443, err443 := httpcheck.IsPortOpen443(domain)
+		if cdn > 0 {
+			// Check if the domain is on a CDN.
+			isCDNs, CDNname := cdncheck.IsCDN(domain)
+			isClouds, CloudName := cdncheck.IsCloud(domain)
+			isWAFs, WAFname := cdncheck.IsWaf(domain)
 
-		// Check if the domain is on a CDN.
-		isCDNs, CDNname := cdncheck.IsCDN(domain)
-		isClouds, CloudName := cdncheck.IsCloud(domain)
-		isWAFs, WAFname := cdncheck.IsWaf(domain)
-
-		result := DomainResult{
-			Domain:    domain,
-			Port80:    port80 && err80 == nil,
-			Port443:   port443 && err443 == nil,
-			IsCDN:     isCDNs,
-			CDNname:   CDNname,
-			isCloud:   isClouds,
-			CloudName: CloudName,
-			isWAF:     isWAFs,
-			WAFname:   WAFname,
+			result = DomainResult{
+				Domain:    domain,
+				Port80:    port80 && err80 == nil,
+				Port443:   port443 && err443 == nil,
+				IsCDN:     isCDNs,
+				CDNname:   CDNname,
+				isCloud:   isClouds,
+				CloudName: CloudName,
+				isWAF:     isWAFs,
+				WAFname:   WAFname,
+			}
+		} else {
+			result = DomainResult{
+				Domain:    domain,
+				Port80:    port80 && err80 == nil,
+				Port443:   port443 && err443 == nil,
+				IsCDN:     false,
+				CDNname:   "",
+				isCloud:   false,
+				CloudName: "",
+				isWAF:     false,
+				WAFname:   "",
+			}
 		}
 
 		// If port 80 or 443 is open, print a message and store the result.
