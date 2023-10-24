@@ -37,21 +37,21 @@ For Use This Enter Website without http  In Input File
 Like : google.com
 
 ```
-subcheck -l 'C:\Users\**\Desktop\go2\checksubdomains\input.txt' -o 'C:\Users\***\Desktop\go2\checksubdomains\result4.csv'
+subenum -l 'input.txt' -o 'result4.csv'
 
 ```
 ```
-subcheck -d google.com 
+subenum -d google.com 
 ```
 ```
-cat inputfile.txt | subcheck -pipe -o output.csv
+cat inputfile.txt | subenum -pipe -o output.csv
 ```
 ```
 NAME:
-   subcheck - A new cli application
+   subenum - A new cli application
 
 USAGE:
-   subcheck [global options] command [command options] [arguments...]
+   subenum [global options] command [command options] [arguments...]
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
