@@ -1,3 +1,0 @@
-Domain,Port 80,Port 443,Is CDN,CDN Name,Is Cloud,Cloud name,has Waf,WAF name
-persianrank.ir,true,true,false,,false,,false,
-www.persianrank.ir,true,true,false,,false,,false,
